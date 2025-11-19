@@ -29,6 +29,7 @@ func MoudlesHandler(c *gin.Context) {
 	models := []map[string]interface{}{
 		{"id": "claude-3-7-sonnet-20250219"},
 		{"id": "claude-sonnet-4-20250514"},
+		{"id": "claude-sonnet-4-5-20250929"},
 		{"id": "claude-opus-4-20250514"},
 	}
 
@@ -168,7 +169,7 @@ func parseAndValidateRequest(c *gin.Context) (*model.ChatCompletionRequest, erro
 
 func getModelOrDefault(model string) string {
 	if model == "" {
-		return "claude-3-7-sonnet-20250219"
+		return "claude-sonnet-4-5-20250929"
 	}
 	return model
 }

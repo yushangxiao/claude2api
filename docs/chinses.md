@@ -151,7 +151,7 @@ mirrorApiPrefix: ""
    -H "Content-Type: application/json" \
    -H "Authorization: Bearer YOUR_API_KEY" \
    -d '{
-     "model": "claude-3-7-sonnet-20250219",
+     "model": "claude-sonnet-4-5-20250929",
      "messages": [
        {
          "role": "user",
@@ -168,7 +168,7 @@ mirrorApiPrefix: ""
    -H "Content-Type: application/json" \
    -H "Authorization: Bearer YOUR_API_KEY" \
    -d '{
-     "model": "claude-3-7-sonnet-20250219",
+     "model": "claude-sonnet-4-5-20250929",
      "messages": [
        {
          "role": "user",
