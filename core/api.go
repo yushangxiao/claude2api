@@ -24,6 +24,7 @@ type Client struct {
 	orgID        string
 	client       *req.Client
 	model        string
+	requestModel string
 	defaultAttrs map[string]interface{}
 }
 
@@ -70,9 +71,10 @@ func NewClient(sessionKey string, proxy string, model string) *Client {
 	})
 	// Create default client with session key
 	c := &Client{
-		SessionKey: sessionKey,
-		client:     client,
-		model:      model,
+		SessionKey:   sessionKey,
+		client:       client,
+		model:        model,
+		requestModel: model,
 		defaultAttrs: map[string]interface{}{
 			"personalized_styles": []map[string]interface{}{
 				{
@@ -271,7 +273,7 @@ func (c *Client) HandleResponse(body io.ReadCloser, stream bool, gc *gin.Context
 		var event ResponseEvent
 		if err := json.Unmarshal([]byte(data), &event); err == nil {
 			if event.Type == "error" && event.Error.Message != "" {
-				model.ReturnOpenAIResponse(event.Error.Message, stream, gc)
+				model.ReturnOpenAIResponse(event.Error.Message, stream, gc, c.requestModel)
 				return nil
 			}
 			if event.ContentBlock.Type == "tool_use" {
@@ -294,7 +296,7 @@ func (c *Client) HandleResponse(body io.ReadCloser, stream bool, gc *gin.Context
 				if !stream {
 					continue
 				}
-				model.ReturnOpenAIResponse(res_text, stream, gc)
+				model.ReturnOpenAIResponse(res_text, stream, gc, c.requestModel)
 				continue
 			}
 			if event.Delta.Type == "text_delta" && event.Delta.Text != "" {
@@ -303,7 +305,7 @@ func (c *Client) HandleResponse(body io.ReadCloser, stream bool, gc *gin.Context
 				if !stream {
 					continue
 				}
-				model.ReturnOpenAIResponse(res_text, stream, gc)
+				model.ReturnOpenAIResponse(res_text, stream, gc, c.requestModel)
 				continue
 			}
 			if event.Delta.Type == "thinking_delta" {
@@ -316,7 +318,7 @@ func (c *Client) HandleResponse(body io.ReadCloser, stream bool, gc *gin.Context
 				if !stream {
 					continue
 				}
-				model.ReturnOpenAIResponse(res_text, stream, gc)
+				model.ReturnOpenAIResponse(res_text, stream, gc, c.requestModel)
 				continue
 			}
 			if event.Delta.Type == "input_json_delta" {
@@ -382,7 +384,7 @@ func (c *Client) HandleResponse(body io.ReadCloser, stream bool, gc *gin.Context
 				if !stream {
 					continue
 				}
-				model.ReturnOpenAIResponse(res_text, stream, gc)
+				model.ReturnOpenAIResponse(res_text, stream, gc, c.requestModel)
 				continue
 			}
 		}
@@ -391,7 +393,7 @@ func (c *Client) HandleResponse(body io.ReadCloser, stream bool, gc *gin.Context
 		return fmt.Errorf("error reading response: %w", err)
 	}
 	if !stream {
-		model.ReturnOpenAIResponse(res_all_text, stream, gc)
+		model.ReturnOpenAIResponse(res_all_text, stream, gc, c.requestModel)
 	} else {
 		// 发送结束标志
 		gc.Writer.Write([]byte("data: [DONE]\n\n"))

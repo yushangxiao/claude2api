@@ -66,20 +66,23 @@ type Usage struct {
 	TotalTokens      int `json:"total_tokens"`
 }
 
-func ReturnOpenAIResponse(text string, stream bool, gc *gin.Context) error {
+func ReturnOpenAIResponse(text string, stream bool, gc *gin.Context, modelName string) error {
+	if modelName == "" {
+		modelName = "claude-3-7-sonnet-20250219"
+	}
 	if stream {
-		return streamRespose(text, gc)
+		return streamRespose(text, modelName, gc)
 	} else {
-		return noStreamResponse(text, gc)
+		return noStreamResponse(text, modelName, gc)
 	}
 }
 
-func streamRespose(text string, gc *gin.Context) error {
+func streamRespose(text string, modelName string, gc *gin.Context) error {
 	openAIResp := &OpenAISrteamResponse{
 		ID:      uuid.New().String(),
 		Object:  "chat.completion.chunk",
 		Created: time.Now().Unix(),
-		Model:   "claude-3-7-sonnet-20250219",
+		Model:   modelName,
 		Choices: []StreamChoice{
 			{
 				Index: 0,
@@ -106,12 +109,12 @@ func streamRespose(text string, gc *gin.Context) error {
 	return nil
 }
 
-func noStreamResponse(text string, gc *gin.Context) error {
+func noStreamResponse(text string, modelName string, gc *gin.Context) error {
 	openAIResp := &OpenAIResponse{
 		ID:      uuid.New().String(),
 		Object:  "chat.completion",
 		Created: time.Now().Unix(),
-		Model:   "claude-3-7-sonnet-20250219",
+		Model:   modelName,
 		Choices: []NoStreamChoice{
 			{
 				Index: 0,
